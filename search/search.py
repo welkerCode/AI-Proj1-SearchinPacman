@@ -18,6 +18,7 @@ Pacman agents (in searchAgents.py).
 """
 
 import util
+from util import *
 
 class SearchProblem:
     """
@@ -62,6 +63,23 @@ class SearchProblem:
         util.raiseNotDefined()
 
 
+class SearchNode:
+
+    def __init__(self, state, parentNode = None, action = None):
+        self.state = state
+        self.parentNode = parentNode
+        self.action = action
+
+    def getState(self):
+        return self.state
+
+    def getParentNode(self):
+        return self.parentNode
+
+    def getAction(self):
+        return self.action
+
+
 def tinyMazeSearch(problem):
     """
     Returns a sequence of moves that solves tinyMaze.  For any other maze, the
@@ -87,6 +105,33 @@ def depthFirstSearch(problem):
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
     "*** YOUR CODE HERE ***"
+
+    stack = Stack()
+    initNode = SearchNode(problem.getStartState())
+    stack.push(initNode)
+    visited = []
+    while not stack.isEmpty():
+        nextStateNode = stack.pop()
+        nextState = nextStateNode.getState()
+        if nextState not in visited:
+            #print "The next state is: ", nextState
+            visited.append(nextState)
+
+            if problem.isGoalState(nextState):
+                print "Found the goal"
+                print "Visited List: ", visited
+                plan = getPlan(nextStateNode)
+                print "Plan: ", plan
+
+
+                return plan
+
+            for successor in problem.getSuccessors(nextState):
+                #print "This is a successor: ", successor
+                # Put the successor into a Search Node
+                successorNode = SearchNode(successor[0], nextStateNode, successor[1])
+                stack.push(successorNode)
+
     util.raiseNotDefined()
 
 def breadthFirstSearch(problem):
@@ -111,6 +156,18 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     "*** YOUR CODE HERE ***"
     util.raiseNotDefined()
 
+
+def getPlan(finalNode):
+    plan = []
+    currNode = finalNode
+    while currNode.getParentNode() is not None:
+        plan.append(currNode.getAction())
+        currNode = currNode.getParentNode()
+    # I learned how to reverse a list from https://stackoverflow.com/questions/4280691/list-reverse-does-not-return-list/
+    # for some reason, plan.reverse() always returns None, so I am using slicing instead
+    reversedPlan = plan[::-1]
+    #print "Reversed Plan: ", reversedPlan
+    return reversedPlan
 
 # Abbreviations
 bfs = breadthFirstSearch
