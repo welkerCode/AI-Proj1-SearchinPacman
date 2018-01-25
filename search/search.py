@@ -68,10 +68,11 @@ class SearchProblem:
 
 class SearchNode:
 
-    def __init__(self, state, parentNode = None, action = None):
+    def __init__(self, state, parentNode = None, action = None, cost = None):
         self.state = state
         self.parentNode = parentNode
         self.action = action
+        self.cost = cost
 
     def getState(self):
         return self.state
@@ -81,6 +82,9 @@ class SearchNode:
 
     def getAction(self):
         return self.action
+
+    def getCost(self):
+        return self.cost
 
 
 def tinyMazeSearch(problem):
@@ -176,6 +180,36 @@ def breadthFirstSearch(problem):
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
+    p_queue = PriorityQueue()  # DFS requires a p_queue
+    initNode = SearchNode(problem.getStartState())  # Get the initial state and save it in a Search Node
+    p_queue.push(initNode,0)  # Put the initial node onto the p_queue
+    visited = []  # Create a visited list
+
+    while not p_queue.isEmpty():  # Until the p_queue is empty (and we fail to find the goal)
+        nextStateNode = p_queue.pop()  # Get the next node off of the p_queue
+        nextState = nextStateNode.getState()  # Save its state in a local variable
+        if nextState not in visited:  # If the state has not been visited previously
+            visited.append(nextState)  # Add it to the visited list
+            if problem.isGoalState(nextState):  # If the state is a goal state
+                plan = getPlan(nextStateNode)  # Get the plan that takes pacman to the goal state
+
+                if DEBUG is True:  # Some debug statements
+                    print "Plan: ", plan  # Print the plan
+                    print "Visited List: ", visited  # Print the visited list
+
+                return plan  # Return the plan (and exit the DFS)
+
+            # If we have reached this part of the DFS, then the current state is not a goal state
+            for successor in problem.getSuccessors(nextState):  # For every possible action and potential new state
+
+                if DEBUG is True:  # Some debug statements
+                    print "This is a successor: ", successor  # Print the successor (in a for loop)
+
+                successorNode = SearchNode(successor[0], nextStateNode, successor[1], successor[2])  # Convert to Search Node
+                p_queue.push(successorNode, successorNode.getCost())  # Push onto p_queue
+
+    return None  # If we get here, DFS failed
+
     util.raiseNotDefined()
 
 def nullHeuristic(state, problem=None):
