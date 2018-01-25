@@ -20,6 +20,9 @@ Pacman agents (in searchAgents.py).
 import util
 from util import *
 
+DEBUG = False
+
+
 class SearchProblem:
     """
     This class outlines the structure of a search problem, but doesn't implement
@@ -106,38 +109,69 @@ def depthFirstSearch(problem):
     """
     "*** YOUR CODE HERE ***"
 
-    stack = Stack()
-    initNode = SearchNode(problem.getStartState())
-    stack.push(initNode)
-    visited = []
-    while not stack.isEmpty():
-        nextStateNode = stack.pop()
-        nextState = nextStateNode.getState()
-        if nextState not in visited:
-            #print "The next state is: ", nextState
-            visited.append(nextState)
+    stack = Stack()                                 # DFS requires a stack
+    initNode = SearchNode(problem.getStartState())  # Get the initial state and save it in a Search Node
+    stack.push(initNode)                            # Put the initial node onto the stack
+    visited = []                                    # Create a visited list
 
-            if problem.isGoalState(nextState):
-                print "Found the goal"
-                print "Visited List: ", visited
-                plan = getPlan(nextStateNode)
-                print "Plan: ", plan
+    while not stack.isEmpty():                      # Until the stack is empty (and we fail to find the goal)
+        nextStateNode = stack.pop()                 # Get the next node off of the stack
+        nextState = nextStateNode.getState()        # Save its state in a local variable
+        if nextState not in visited:                # If the state has not been visited previously
+            visited.append(nextState)               # Add it to the visited list
+            if problem.isGoalState(nextState):      # If the state is a goal state
+                plan = getPlan(nextStateNode)       # Get the plan that takes pacman to the goal state
 
+                if DEBUG is True:                   # Some debug statements
+                    print "Plan: ", plan            # Print the plan
+                    print "Visited List: ", visited # Print the visited list
 
-                return plan
+                return plan                         # Return the plan (and exit the DFS)
 
-            for successor in problem.getSuccessors(nextState):
-                #print "This is a successor: ", successor
-                # Put the successor into a Search Node
-                successorNode = SearchNode(successor[0], nextStateNode, successor[1])
-                stack.push(successorNode)
+            # If we have reached this part of the DFS, then the current state is not a goal state
+            for successor in problem.getSuccessors(nextState):  # For every possible action and potential new state
 
-    util.raiseNotDefined()
+                if DEBUG is True:                               # Some debug statements
+                    print "This is a successor: ", successor    # Print the successor (in a for loop)
+
+                successorNode = SearchNode(successor[0], nextStateNode, successor[1])   # Convert to Search Node
+                stack.push(successorNode)                                               # Push onto stack
+
+    return None                                                                         # If we get here, DFS failed
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    queue = Queue()                                 # DFS requires a queue
+    initNode = SearchNode(problem.getStartState())  # Get the initial state and save it in a Search Node
+    queue.push(initNode)                            # Put the initial node onto the queue
+    visited = []                                    # Create a visited list
+
+    while not queue.isEmpty():                      # Until the queue is empty (and we fail to find the goal)
+        nextStateNode = queue.pop()                 # Get the next node off of the queue
+        nextState = nextStateNode.getState()        # Save its state in a local variable
+        if nextState not in visited:                # If the state has not been visited previously
+            visited.append(nextState)               # Add it to the visited list
+            if problem.isGoalState(nextState):      # If the state is a goal state
+                plan = getPlan(nextStateNode)       # Get the plan that takes pacman to the goal state
+
+                if DEBUG is True:                   # Some debug statements
+                    print "Plan: ", plan            # Print the plan
+                    print "Visited List: ", visited # Print the visited list
+
+                return plan                         # Return the plan (and exit the DFS)
+
+            # If we have reached this part of the DFS, then the current state is not a goal state
+            for successor in problem.getSuccessors(nextState):  # For every possible action and potential new state
+
+                if DEBUG is True:                               # Some debug statements
+                    print "This is a successor: ", successor    # Print the successor (in a for loop)
+
+                successorNode = SearchNode(successor[0], nextStateNode, successor[1])  # Convert to Search Node
+                queue.push(successorNode)                                              # Push onto queue
+
+    return None                                                                         # If we get here, DFS failed
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
