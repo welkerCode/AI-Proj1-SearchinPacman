@@ -68,7 +68,7 @@ class SearchProblem:
 
 class SearchNode:
 
-    def __init__(self, state, parentNode = None, action = None, cost = None):
+    def __init__(self, state, parentNode = None, action = None, cost = 0):
         self.state = state
         self.parentNode = parentNode
         self.action = action
@@ -205,8 +205,8 @@ def uniformCostSearch(problem):
                 if DEBUG is True:  # Some debug statements
                     print "This is a successor: ", successor  # Print the successor (in a for loop)
 
-                successorNode = SearchNode(successor[0], nextStateNode, successor[1], successor[2])  # Convert to Search Node
-                p_queue.push(successorNode, successorNode.getCost())  # Push onto p_queue
+                successorNode = SearchNode(successor[0], nextStateNode, successor[1], successor[2] + nextStateNode.getCost())  # Convert to Search Node
+                p_queue.update(successorNode, successorNode.getCost())  # Push onto p_queue
 
     return None  # If we get here, DFS failed
 
