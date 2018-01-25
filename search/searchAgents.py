@@ -281,6 +281,9 @@ class CornersProblem(search.SearchProblem):
         self.startingPosition = startingGameState.getPacmanPosition()
         top, right = self.walls.height-2, self.walls.width-2
         self.corners = ((1,1), (1,top), (right, 1), (right, top))
+
+        print "Dear Brian:  The Maze distance between corners 0 and 1 is: ", mazeDistance(self.corners[0], self.corners[1], startingGameState)
+
         for corner in self.corners:
             if not startingGameState.hasFood(*corner):
                 print 'Warning: no food in corner ' + str(corner)
@@ -289,7 +292,7 @@ class CornersProblem(search.SearchProblem):
         # in initializing the problem
         "*** YOUR CODE HERE ***"
         self.costFn = lambda x: 1
-
+        self.gameState = startingGameState
     def getStartState(self):
         """
         Returns the start state (in your state space, not the full Pacman state
@@ -384,7 +387,20 @@ def cornersHeuristic(state, problem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+    minCost = 99999999999
+    for i in xrange(len(corners)):
+        for j in xrange(len(corners)):
+            for k in xrange(len(corners)):
+                for l in xrange(len(corners)):
+                    if i != j != k != l:
+                        cost = mazeDistance((state[0], state[1]), corners[i],problem.gameState)
+                        cost += mazeDistance(corners[i], corners[j],problem.gameState)
+                        cost += mazeDistance(corners[j], corners[k],problem.gameState)
+                        cost += mazeDistance(corners[k], corners[l],problem.gameState)
+                        if cost < minCost:
+                            minCost = cost
+
+    return minCost # Default to trivial solution
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
