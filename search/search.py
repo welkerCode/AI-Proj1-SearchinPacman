@@ -147,7 +147,7 @@ def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
 
-    queue = Queue()                                 # DFS requires a queue
+    queue = Queue()                                 # BFS requires a queue
     initNode = SearchNode(problem.getStartState())  # Get the initial state and save it in a Search Node
     queue.push(initNode)                            # Put the initial node onto the queue
     visited = []                                    # Create a visited list
@@ -166,7 +166,7 @@ def breadthFirstSearch(problem):
 
                 return plan                         # Return the plan (and exit the DFS)
 
-            # If we have reached this part of the DFS, then the current state is not a goal state
+            # If we have reached this part of the BFS, then the current state is not a goal state
             for successor in problem.getSuccessors(nextState):  # For every possible action and potential new state
 
                 if DEBUG is True:                               # Some debug statements
@@ -175,12 +175,12 @@ def breadthFirstSearch(problem):
                 successorNode = SearchNode(successor[0], nextStateNode, successor[1])  # Convert to Search Node
                 queue.push(successorNode)                                              # Push onto queue
 
-    return None                                                                         # If we get here, DFS failed
+    return None                                                                         # If we get here, BFS failed
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    p_queue = PriorityQueue()  # DFS requires a p_queue
+    p_queue = PriorityQueue()  # UCS requires a priority queue
     initNode = SearchNode(problem.getStartState())  # Get the initial state and save it in a Search Node
     p_queue.push(initNode,0)  # Put the initial node onto the p_queue
     visited = []  # Create a visited list
@@ -197,7 +197,7 @@ def uniformCostSearch(problem):
                     print "Plan: ", plan  # Print the plan
                     print "Visited List: ", visited  # Print the visited list
 
-                return plan  # Return the plan (and exit the DFS)
+                return plan  # Return the plan (and exit the UCS)
 
             # If we have reached this part of the DFS, then the current state is not a goal state
             for successor in problem.getSuccessors(nextState):  # For every possible action and potential new state
@@ -206,9 +206,9 @@ def uniformCostSearch(problem):
                     print "This is a successor: ", successor  # Print the successor (in a for loop)
 
                 successorNode = SearchNode(successor[0], nextStateNode, successor[1], successor[2] + nextStateNode.getCost())  # Convert to Search Node
-                p_queue.update(successorNode, successorNode.getCost())  # Push onto p_queue
+                p_queue.update(successorNode, successorNode.getCost())  # Push onto p_queue with its cost
 
-    return None  # If we get here, DFS failed
+    return None  # If we get here, UCS failed
 
 def nullHeuristic(state, problem=None):
     """
@@ -220,7 +220,7 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    p_queue = PriorityQueue()  # DFS requires a p_queue
+    p_queue = PriorityQueue()  # A* requires a priority queue
     initNode = SearchNode(problem.getStartState())  # Get the initial state and save it in a Search Node
     p_queue.push(initNode, 0)  # Put the initial node onto the p_queue
     visited = []  # Create a visited list
@@ -237,9 +237,9 @@ def aStarSearch(problem, heuristic=nullHeuristic):
                     print "Plan: ", plan  # Print the plan
                     print "Visited List: ", visited  # Print the visited list
 
-                return plan  # Return the plan (and exit the DFS)
+                return plan  # Return the plan (and exit the A*)
 
-            # If we have reached this part of the DFS, then the current state is not a goal state
+            # If we have reached this part of the A*, then the current state is not a goal state
             for successor in problem.getSuccessors(nextState):  # For every possible action and potential new state
 
                 if DEBUG is True:  # Some debug statements
@@ -248,9 +248,9 @@ def aStarSearch(problem, heuristic=nullHeuristic):
                 successorNode = SearchNode(successor[0], nextStateNode, successor[1],
                                            successor[2] + nextStateNode.getCost())  # Convert to Search Node
 
-                nodeHeur = heuristic(successorNode.getState(), problem);
+                nodeHeur = heuristic(successorNode.getState(), problem); # Get the heuristic for this new state
 
-                p_queue.update(successorNode, successorNode.getCost() + nodeHeur)  # Push onto p_queue
+                p_queue.update(successorNode, successorNode.getCost() + nodeHeur)  # Push onto p_queue,  adding the heuristic to the cost.
 
     return None  # If we get here, A* failed
 

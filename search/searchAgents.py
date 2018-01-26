@@ -282,7 +282,16 @@ class CornersProblem(search.SearchProblem):
         top, right = self.walls.height-2, self.walls.width-2
         self.corners = ((1,1), (1,top), (right, 1), (right, top))
 
-        print "Dear Brian:  The Maze distance between corners 0 and 1 is: ", mazeDistance(self.corners[0], self.corners[1], startingGameState)
+        #print "Dear Brian:  The Maze distance between corners 0 and 1 is: ", mazeDistance(self.corners[0], self.corners[1], startingGameState)
+
+        self.distances = []
+        for i in xrange(len(self.corners)):
+            temp = []
+            for j in xrange(len(self.corners)):
+                temp.append(mazeDistance(self.corners[i],self.corners[j],startingGameState))
+            self.distances.append(temp)
+        print self.distances
+
 
         for corner in self.corners:
             if not startingGameState.hasFood(*corner):
@@ -387,19 +396,55 @@ def cornersHeuristic(state, problem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
-    minCost = 99999999999
-    for i in xrange(len(corners)):
-        for j in xrange(len(corners)):
-            for k in xrange(len(corners)):
-                for l in xrange(len(corners)):
-                    if i != j != k != l:
-                        cost = mazeDistance((state[0], state[1]), corners[i],problem.gameState)
-                        cost += mazeDistance(corners[i], corners[j],problem.gameState)
-                        cost += mazeDistance(corners[j], corners[k],problem.gameState)
-                        cost += mazeDistance(corners[k], corners[l],problem.gameState)
-                        if cost < minCost:
-                            minCost = cost
+    minCost = 0
 
+    destinations = []
+    for i in xrange(len(corners)):
+        if state[i + 2] == 0:
+            destinations.append(corners[i])
+
+    permutations = []
+    goals = len(destinations)
+
+    for a in destinations:
+        if goals < 2:
+            permutations.append([(state[0], state[1]), a])
+        else:
+            for b in destinations:
+                if b != a:
+                    if goals < 3:
+                        permutations.append([(state[0], state[1]), a, b])
+                    else:
+                        for c in destinations:
+                            if c != b and c != a:
+                                if goals < 4:
+                                    permutations.append([(state[0], state[1]), a, b, c])
+                                else:
+                                    for d in destinations:
+                                        if d != c and d != b and d != a:
+                                            permutations.append([(state[0], state[1]), a, b, c, d])
+
+    for i in range(len(permutations)):
+        cost = 0
+        for j in xrange(len(permutations[i]) - 1):
+            if j ==0:
+                cost += util.manhattanDistance(permutations[i][j], permutations[i][j + 1])
+                #cost += mazeDistance(permutations[i][j],permutations[i][j+1],problem.gameState)
+            else:
+                cost += problem.distances[corners.index(permutations[i][j])][corners.index(permutations[i][j+1])]
+        if minCost == 0 or minCost  > cost:
+            minCost = cost
+            order = i
+    if len(permutations) > 0:
+        minCost = mazeDistance(permutations[i][0],permutations[i][1],problem.gameState)
+        #minCost = util.manhattanDistance(permutations[i][0],permutations[i][1])
+    elif len(destinations) > 0:
+        minCost = mazeDistance((state[0],state[1]),destinations[0],problem.gameState)
+        #minCost = util.manhattanDistance((state[0],state[1]),destinations[0])
+
+
+
+    #print minCost
     return minCost # Default to trivial solution
 
 class AStarCornersAgent(SearchAgent):
@@ -494,7 +539,20 @@ def foodHeuristic(state, problem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    return 0
+    destinations = foodGrid.asList()
+    current = position
+    heuristic = 0
+    totalDistance = []
+    for food in destinations:
+        cost = 0
+        for otherFood in destinations:
+            cost += util.manhattanDistance(food,otherFood)
+        cost+=util.manhattanDistance(position,food)
+        totalDistance.append(cost)
+    if totalDistance:
+        index = totalDistance.index(min(totalDistance))
+        heuristic = mazeDistance(current,destinations[index],problem.startingGameState)
+    return heuristic
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
@@ -524,7 +582,14 @@ class ClosestDotSearchAgent(SearchAgent):
         walls = gameState.getWalls()
         problem = AnyFoodSearchProblem(gameState)
 
+
+
         "*** YOUR CODE HERE ***"
+
+        return(search.breadthFirstSearch(problem))
+
+
+
         util.raiseNotDefined()
 
 class AnyFoodSearchProblem(PositionSearchProblem):
@@ -558,10 +623,9 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         The state is Pacman's position. Fill this in with a goal test that will
         complete the problem definition.
         """
-        x,y = state
-
+        
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+	return(self.food[state[0]][state[1]])       
 
 def mazeDistance(point1, point2, gameState):
     """
