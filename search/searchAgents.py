@@ -331,6 +331,10 @@ class CornersProblem(search.SearchProblem):
             is the incremental cost of expanding to that successor
         """
 
+
+	"*** YOUR CODE HERE ***"
+
+	# This part is copied from above
         successors = []
         for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
             # Add a successor state to the successor list if the action is legal
@@ -339,12 +343,15 @@ class CornersProblem(search.SearchProblem):
             #   dx, dy = Actions.directionToVector(action)
             #   nextx, nexty = int(x + dx), int(y + dy)
             #   hitsWall = self.walls[nextx][nexty]
+ 
+	    
 
-            x, y, cor_0, cor_1, cor_2, cor_3 = state
-            dx, dy = Actions.directionToVector(action)
+            x, y, cor_0, cor_1, cor_2, cor_3 = state	# Our state is 6 dimensions
+            dx, dy = Actions.directionToVector(action)	
             nextx, nexty = int(x + dx), int(y + dy)
             if not self.walls[nextx][nexty]:
 
+		# Here we check to see if our x,y coordinates match any of the corners.
                 if (nextx,nexty) == self.corners[0]:
                     cor_0 = 1
                 elif (nextx,nexty) == self.corners[1]:
@@ -354,12 +361,11 @@ class CornersProblem(search.SearchProblem):
                 elif (nextx,nexty) == self.corners[3]:
                     cor_3 = 1
 
+		# Update our 6D state.
                 nextState = (nextx, nexty, cor_0, cor_1, cor_2, cor_3)
                 cost = self.costFn(nextState)
 
-                successors.append((nextState, action, cost))
-
-            "*** YOUR CODE HERE ***"
+                successors.append((nextState, action, cost))           
 
 
         self._expanded += 1 # DO NOT CHANGE
@@ -406,6 +412,7 @@ def cornersHeuristic(state, problem):
     permutations = []
     goals = len(destinations)
 
+    # The nested if loops are meant to help find every permutation of corner combinations 
     for a in destinations:
         if goals < 2:
             permutations.append([(state[0], state[1]), a])
@@ -424,6 +431,7 @@ def cornersHeuristic(state, problem):
                                         if d != c and d != b and d != a:
                                             permutations.append([(state[0], state[1]), a, b, c, d])
 
+    # For every permutation, find its minimum cost
     for i in range(len(permutations)):
         cost = 0
         for j in xrange(len(permutations[i]) - 1):
@@ -435,17 +443,19 @@ def cornersHeuristic(state, problem):
         if minCost == 0 or minCost  > cost:
             minCost = cost
             order = i
+
+    # Find the minimum cost of every permutation
     if len(permutations) > 0:
         minCost = mazeDistance(permutations[i][0],permutations[i][1],problem.gameState)
-        #minCost = util.manhattanDistance(permutations[i][0],permutations[i][1])
+        #minCost = util.manhattanDistance(permutations[i][0],permutations[i][1]) # (tried different heursitsics)
     elif len(destinations) > 0:
         minCost = mazeDistance((state[0],state[1]),destinations[0],problem.gameState)
-        #minCost = util.manhattanDistance((state[0],state[1]),destinations[0])
+        #minCost = util.manhattanDistance((state[0],state[1]),destinations[0]) # (tried different heursitsics)
 
 
 
     #print minCost
-    return minCost # Default to trivial solution
+    return minCost # Return the minimum cost over the permutations as the heuristic.
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
@@ -539,17 +549,26 @@ def foodHeuristic(state, problem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    destinations = foodGrid.asList()
-    current = position
+
+
+    destinations = foodGrid.asList() # Get a list of all the food locations
+    current = position		     # Get the current position
     heuristic = 0
     totalDistance = []
+
+    # For every food in our list
     for food in destinations:
         cost = 0
+
+	# Find its distance between it and every other food in the list, adding it to its cost
         for otherFood in destinations:
             cost += util.manhattanDistance(food,otherFood)
         cost+=util.manhattanDistance(position,food)
         totalDistance.append(cost)
+
+    # Provided we didn't get an empty list
     if totalDistance:
+	# Get the index of the minimum cost food, and set its distance between it and pacman's position as the heuristic
         index = totalDistance.index(min(totalDistance))
         heuristic = mazeDistance(current,destinations[index],problem.startingGameState)
     return heuristic
@@ -585,7 +604,7 @@ class ClosestDotSearchAgent(SearchAgent):
 
 
         "*** YOUR CODE HERE ***"
-
+	# Simply run a BFS, where the goal is any food pellet.
         return(search.breadthFirstSearch(problem))
 
 
@@ -625,6 +644,7 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         """
         
         "*** YOUR CODE HERE ***"
+	# Any food pellet is considered a goal.
 	return(self.food[state[0]][state[1]])       
 
 def mazeDistance(point1, point2, gameState):
