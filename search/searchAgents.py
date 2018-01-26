@@ -282,7 +282,7 @@ class CornersProblem(search.SearchProblem):
         top, right = self.walls.height-2, self.walls.width-2
         self.corners = ((1,1), (1,top), (right, 1), (right, top))
 
-        print "Dear Brian:  The Maze distance between corners 0 and 1 is: ", mazeDistance(self.corners[0], self.corners[1], startingGameState)
+        #print "Dear Brian:  The Maze distance between corners 0 and 1 is: ", mazeDistance(self.corners[0], self.corners[1], startingGameState)
 
         for corner in self.corners:
             if not startingGameState.hasFood(*corner):
